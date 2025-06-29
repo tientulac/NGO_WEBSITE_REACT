@@ -1,5 +1,5 @@
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Form } from "antd";
+import { Button, Form, Input, Modal } from "antd";
 import { FilterEntity } from "../../entities/components/filter.entity";
 import { ColumnEntity } from "../../entities/components/column.entity";
 import { Role } from "../../entities/role.entity";
@@ -7,13 +7,14 @@ import { renderFilterBar } from "../../components/FilterBar.component";
 import { renderTable } from "../../components/Table.component";
 import { useEffect, useState } from "react";
 import { BaseService } from "../../services/base.service";
+import { toast } from 'react-toastify';
 
 const filters: FilterEntity[] = [
   {
-    id: "keyword",
-    label: "Từ khóa",
+    id: "name",
+    label: "Tên quyền",
     typeControl: "input",
-    placeholder: "Nhập từ khóa...",
+    placeholder: "",
     order: 1,
     isVisible: true,
   },
@@ -46,64 +47,104 @@ const columns: ColumnEntity[] = [
   },
 ];
 
-const rows: Role[] = [
-  {
-    id: 1,
-    code: "ADMIN",
-    name: "Quản trị viên",
-  },
-  {
-    id: 2,
-    code: "USER",
-    name: "Người dùng",
-  },
-];
-
 const RolePage: React.FC = () => {
   const [rows, setRows] = useState<Role[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
   const [form] = Form.useForm();
+  const [formSave] = Form.useForm();
+  const [showModal, setShowModal] = useState(false);
+  const [editingRole, setEditingRole] = useState<Role | null>(null);
 
-  // useEffect(() => {
-  //   const getList = async () => {
-  //     try {
-  //       const response = await BaseService.getList<Role[]>("/users");
-  //       if (response.status === 200) {
-  //         setRows(response.data);
-  //         setLoading(false);
-  //       } else {
-  //         alert(response.message);
-  //         setLoading(false);
-  //       }
-  //     } catch (err) {
-  //       alert(err);
-  //       setLoading(false);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
+  useEffect(() => {
+    const getList = async () => {
+      await handleSearch();
+    };
 
-  //   getList();
-  // }, []);
+    getList();
+  }, []);
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     const values = filters.reduce((acc, filter) => {
       acc[filter.id] = filter.value;
       return acc;
     }, {} as Record<string, any>);
+    console.log(values);
 
-    console.log("Giá trị tìm kiếm:", values);
+    try {
+      const response = await BaseService.getList<Role[]>("/roles/list");
+      if (response.status === 200) {
+        setRows(response.data);
+        setLoading(false);
+      } else {
+        toast.warning(response.message);
+        setLoading(false);
+      }
+    } catch (err) {
+      toast.warning("Internal server error");
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleEdit = (record: Role) => {
-    console.log("📝 Sửa:", record);
+    openEditModal(record);
   };
 
   const handleDelete = (record: Role) => {
-    console.log("🗑️ Xóa:", record);
+    Modal.confirm({
+      title: "Xác nhận xóa",
+      content: `Bạn có chắc chắn muốn xóa ?`,
+      okText: "Xóa",
+      okType: "danger",
+      cancelText: "Hủy",
+      onOk: async () => {
+        try {
+          const response = await BaseService.post(`/roles/delete`, record);
+          if (response.status === 200) {
+            toast.success("Thành công");
+            handleSearch();
+          } else {
+            toast.error(response.message);
+          }
+        } catch (err) {
+          toast.error("Lỗi hệ thống");
+        }
+      },
+      onCancel() {
+        // không làm gì cả
+      },
+    });
   };
 
+  const openAddModal = () => {
+    setEditingRole(null);
+    formSave.resetFields();
+    setShowModal(true);
+  };
+
+  const openEditModal = (record: Role) => {
+    setEditingRole(record);
+    formSave.setFieldsValue(record);
+    setShowModal(true);
+  };
+
+  const handleSave = async () => {
+    try {
+      const values = await formSave.validateFields();
+      const response = await BaseService.post(`/roles/save`, values);
+      if (response.status === 200) {
+        toast.success("Thành công");
+        handleSearch();
+        setShowModal(false);
+      } else {
+        toast.error(response.message);
+      }
+      formSave.resetFields();
+    } catch (error) {
+      // Form lỗi
+    }
+  };
   return (
     <div className="container">
       <div className="page-inner">
@@ -113,7 +154,11 @@ const RolePage: React.FC = () => {
             <h6 className="op-7 mb-2">Quản lý quyền</h6>
           </div>
           <div className="ms-md-auto py-2 py-md-0">
-            <Button icon={<PlusOutlined />} iconPosition={"end"}>
+            <Button
+              icon={<PlusOutlined />}
+              iconPosition={"end"}
+              onClick={openAddModal}
+            >
               Thêm mới
             </Button>
           </div>
@@ -125,8 +170,8 @@ const RolePage: React.FC = () => {
               <div className="card-body">
                 <div className="row">
                   <div className="row">
-                    <Form form={form} layout="vertical" onFinish={handleSearch}>
-                      {renderFilterBar(filters)}
+                    <Form form={form} layout="vertical">
+                      {renderFilterBar(filters, handleSearch)}
                     </Form>
                   </div>
                 </div>
@@ -162,6 +207,43 @@ const RolePage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* MODAL */}
+      <Modal
+        title={editingRole ? "Cập nhật" : "Thêm mới"}
+        open={showModal}
+        onCancel={() => {
+          setShowModal(false);
+          formSave.resetFields();
+        }}
+        onOk={handleSave}
+        okText="Lưu"
+        cancelText="Hủy"
+      >
+        <Form form={formSave} layout="vertical">
+          <Form.Item
+            name="id"
+            hidden
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Mã"
+            name="code"
+            rules={[{ required: true, message: "Vui lòng nhập mã" }]}
+          >
+            <Input disabled={!!editingRole} />
+          </Form.Item>
+
+          <Form.Item
+            label="Tên"
+            name="name"
+            rules={[{ required: true, message: "Vui lòng nhập tên" }]}
+          >
+            <Input />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };

@@ -1,6 +1,8 @@
 import axios from "axios";
 import { ResponseEntity } from "../entities/response.entity";
 
+const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:3000";
+
 const api = axios.create({
   headers: {
     "Content-Type": "application/json",
@@ -10,11 +12,9 @@ const api = axios.create({
 });
 
 export class BaseService {
-  public apiUrl = process.env.REACT_APP_API_URL;
-
   // GET request
   public static async getList<T>(url: string): Promise<ResponseEntity<T>> {
-    return (await api.get<ResponseEntity<T>>(url)).data;
+    return (await api.get<ResponseEntity<T>>(apiUrl + url)).data;
   }
 
   // POST request
@@ -22,6 +22,6 @@ export class BaseService {
     url: string,
     data: T
   ): Promise<ResponseEntity<T>> {
-    return (await api.post<ResponseEntity<T>>(url, data)).data;
+    return (await api.post<ResponseEntity<T>>(apiUrl + url, data)).data;
   }
 }

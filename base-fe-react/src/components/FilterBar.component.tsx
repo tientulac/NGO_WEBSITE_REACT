@@ -130,7 +130,7 @@ export const renderFilterBar = (
       }}
     >
       <Form.Item>
-        <Button type="primary" icon={<SearchOutlined />} iconPosition={"end"}>
+        <Button onClick={onSearch} htmlType="submit" type="primary" icon={<SearchOutlined />} iconPosition={"end"}>
           Search
         </Button>
       </Form.Item>

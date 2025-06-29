@@ -1,11 +1,17 @@
 import React from "react";
-import Main from "./layouts/main/Main"; // ✅ đường dẫn đúng với file của bạn
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import RolePage from "./pages/role/Role.page";
 
 const App: React.FC = () => {
   return (
-    <div className="app-container">
-      <Main />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />}>
+          <Route path="role" element={<RolePage />} />
+        </Route>
+      </Routes>
+    </Router>
   );
 };
 

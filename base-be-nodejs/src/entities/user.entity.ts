@@ -12,4 +12,7 @@ export interface User extends BaseEntity {
   avatar?: string;
   user_name?: string;
   password?: string;
+  is_active?: boolean;
+  total_amount?: number;
+  token?: string;
 }

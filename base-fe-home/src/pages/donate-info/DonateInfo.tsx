@@ -57,7 +57,7 @@ const DonateInfo: React.FC = () => {
 
                     {/* Form */}
                     <div className="col-md-7">
-                        <div className="bg-light p-4 rounded shadow-sm">
+                        <div className="bg-donation p-4 rounded shadow-sm">
                             {/* Amount */}
                             <label className="form-label fw-semibold small">
                                 Enter donation amount<span className="text-danger">*</span>
@@ -78,7 +78,7 @@ const DonateInfo: React.FC = () => {
                                     <button
                                         key={amt}
                                         type="button"
-                                        className={`btn btn-outline-secondary btn-sm ${amount === amt ? "active" : ""}`}
+                                        className={`btn btn-outline-success btn-sm ${amount === amt ? "active" : ""}`}
                                         onClick={() => setAmount(amt)}
                                     >
                                         {amt.toLocaleString("vi-VN")}

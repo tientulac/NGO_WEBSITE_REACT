@@ -10,3 +10,75 @@
   height: 100%;
   border-radius: 999px;
 }
+
+/* Toàn form donation bên phải */
+.bg-light {
+  background-color: #e0f7f9 !important;
+}
+
+/* Input + select group */
+.input-group,
+.form-control,
+.form-check-input {
+  border-radius: 8px;
+}
+
+/* Input chính */
+.form-control {
+  border: 1px solid #ccc;
+  padding: 10px 14px;
+  font-size: 15px;
+  transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.15rem rgba(0, 123, 255, 0.25);
+}
+
+/* Quick amount buttons */
+.btn-outline-secondary {
+  border-radius: 30px;
+  padding: 6px 18px;
+  font-weight: 500;
+  color: #333;
+  border-color: #ccc;
+  transition: 0.2s;
+}
+
+.btn-outline-secondary.active,
+.btn-outline-secondary:hover {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+/* Label */
+.form-label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* Checkbox */
+.form-check-label {
+  font-size: 14px;
+}
+
+/* Donate button */
+button.btn-primary {
+  background: linear-gradient(to right, #2a6df0, #4285f4);
+  border: none;
+  padding: 12px;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  border-radius: 10px;
+  transition: 0.3s;
+}
+
+button.btn-primary:hover {
+  background: linear-gradient(to right, #1d5ce5, #2f76f8);
+}
+
+.bg-donation {
+  background-color: #ceefee;
+}

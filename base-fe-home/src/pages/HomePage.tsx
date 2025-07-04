@@ -1,19 +1,16 @@
 import React from "react";
-import Footer from "../layouts/Footer";
-import Header from "../layouts/Header";
+import Footer from "../layouts/main/footer/Footer";
 import { Outlet } from "react-router-dom";
+import Header from "../layouts/main/header/Header";
 
 const HomePage: React.FC = () => {
   return (
 
     <div className="wrapper">
-      {/* Main Panel */}
-      <div className="main-panel">
-        {/* Header */}
-        <Header />
-        <Outlet /> {/* Load content động ở đây */}
-        <Footer />
-      </div>
+      {/* Header */}
+      <Header />
+      <Outlet /> {/* Load content động ở đây */}
+      <Footer />
     </div>
   );
 };

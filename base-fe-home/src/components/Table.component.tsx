@@ -29,12 +29,12 @@ export const renderTable = ({
     key: col.id,
     sorter: col.isSortable
       ? (a, b) => {
-          const aVal = a[col.id];
-          const bVal = b[col.id];
-          return typeof aVal === "string" && typeof bVal === "string"
-            ? aVal.localeCompare(bVal)
-            : aVal - bVal;
-        }
+        const aVal = a[col.id];
+        const bVal = b[col.id];
+        return typeof aVal === "string" && typeof bVal === "string"
+          ? aVal.localeCompare(bVal)
+          : aVal - bVal;
+      }
       : undefined,
   }));
 
@@ -67,13 +67,14 @@ export const renderTable = ({
         </Space>
       ),
     });
-    return (
-      <Table
-        columns={antdColumns}
-        dataSource={rows}
-        rowKey={(record) => record.id}
-        pagination={{ pageSize: 10 }}
-      />
-    );
   }
+
+  return (
+    <Table
+      columns={antdColumns}
+      dataSource={rows}
+      rowKey={(record) => record.id}
+      pagination={{ pageSize: 10 }}
+    />
+  );
 };

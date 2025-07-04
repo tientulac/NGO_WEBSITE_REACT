@@ -1,0 +1,12 @@
+.custom-progress {
+  background-color: #ffe0ed;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.custom-progress-bar {
+  background-color: #d83b78;
+  height: 100%;
+  border-radius: 999px;
+}

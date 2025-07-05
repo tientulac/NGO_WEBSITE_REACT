@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./DonateInfo.css";
+import { useNavigate } from "react-router-dom";
 
 const DonateInfo: React.FC = () => {
     const [amount, setAmount] = useState<number>(0);
@@ -8,8 +9,8 @@ const DonateInfo: React.FC = () => {
     const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("datnguyentien1009@gmail.com");
     const [anonymous, setAnonymous] = useState(false);
-
     const quickAmounts = [50000, 100000, 200000, 500000];
+    const navigate = useNavigate();
 
     return (
         <div className="donate-info-page">
@@ -138,8 +139,12 @@ const DonateInfo: React.FC = () => {
                                     I want to donate anonymously
                                 </label>
                             </div>
-
-                            <button className="btn btn-primary w-100 fw-bold">DONATE</button>
+                            <button
+                                className="btn btn-primary w-100 fw-bold"
+                                onClick={() => navigate("/payment")}
+                            >
+                                DONATE
+                            </button>
                         </div>
                     </div>
                 </div>

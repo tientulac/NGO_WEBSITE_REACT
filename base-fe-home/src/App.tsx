@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import HomePage from "./pages/HomePage";
 import Campaign from "./pages/campaign/Campaign";
 import DonateInfo from "./pages/donate-info/DonateInfo";
+import Payment from "./pages/payment/Payment";
 
 const App: React.FC = () => {
   return (
@@ -15,6 +16,7 @@ const App: React.FC = () => {
 
       <Routes>
         <Route path="/" element={<HomePage />}>
+          <Route path="payment" element={<Payment />} />
           <Route path="campaign" element={<Campaign />} />
           <Route path="donate-info" element={<DonateInfo />} />
         </Route>

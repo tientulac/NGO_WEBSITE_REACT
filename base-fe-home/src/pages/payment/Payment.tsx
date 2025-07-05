@@ -1,6 +1,7 @@
 import React from "react";
 import "./Payment.css";
 import { Payment as PaymentEntity } from "../../entities/payment.entity";
+import { useNavigate } from "react-router-dom";
 
 const typePayment = [
     {
@@ -223,6 +224,8 @@ const paymentData: PaymentEntity[] = [
 ]
 
 const Payment: React.FC = () => {
+    const navigate = useNavigate();
+
     return (
         <div className="container">
             <div className="warning-wrapper">
@@ -273,7 +276,8 @@ const Payment: React.FC = () => {
                             height={"100%"}
                         />
                         <p className="scan-note">Scan to Pay</p>
-                        <button className="btn btn-outline-secondary cancel-button">Cancel</button>
+                        <button className="btn btn-outline-secondary cancel-button"
+                            onClick={() => navigate("/campaign")}>Cancel</button>
                     </div>
                 </div>
             </div>
@@ -282,7 +286,6 @@ const Payment: React.FC = () => {
                 return (
                     <div key={type.id} className="mb-4 mt-4">
                         <h6 className="bank-type-title text-muted mb-3">{type.name}</h6>
-
                         {/* Flex container */}
                         <div className="d-flex flex-wrap gap-3">
                             {filteredData.map((item) => (

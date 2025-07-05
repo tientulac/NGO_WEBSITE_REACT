@@ -1,12 +1,12 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-import HomePage from "./pages/HomePage";
 import Campaign from "./pages/campaign/Campaign";
 import DonateInfo from "./pages/donate-info/DonateInfo";
 import Payment from "./pages/payment/Payment";
+import Main from "./pages/Main";
+import HomePage from "./pages/home/HomePage";
 
 const App: React.FC = () => {
   return (
@@ -15,7 +15,9 @@ const App: React.FC = () => {
       <ToastContainer position="top-right" autoClose={3000} />
 
       <Routes>
-        <Route path="/" element={<HomePage />}>
+        <Route path="/" element={<Main />}>
+          <Route index element={<Navigate to="/home" replace />} />
+          <Route path="home" element={<HomePage />} />
           <Route path="payment" element={<Payment />} />
           <Route path="campaign" element={<Campaign />} />
           <Route path="donate-info" element={<DonateInfo />} />

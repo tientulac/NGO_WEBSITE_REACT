@@ -1,6 +1,6 @@
 import React from "react";
 import './Header.css';
-import logo from '../../../static/imgs/logo.jpg';
+import logo from '../../static/imgs/logo.jpg';
 import { Dropdown } from 'react-bootstrap';
 
 const Header: React.FC = () => {
@@ -26,7 +26,7 @@ const Header: React.FC = () => {
         {/* Menu items */}
         <ul className="navbar-nav flex-row gap-4 align-items-center mb-0">
           <li className="nav-item">
-            <a className="nav-link" href="/">Home</a>
+            <a className="nav-link" href="/home">Home</a>
           </li>
           <li className="nav-item">
             <a className="nav-link" href="/campaign">Campaign</a>

@@ -228,10 +228,10 @@ const Payment: React.FC = () => {
             <div className="warning-wrapper">
                 <div className="warning-row">
                     <div className="warning-bar">
-                        ⚠️ Quý khách vui lòng không tắt trình duyệt cho đến khi nhận được kết quả giao dịch trên website. Xin cảm ơn!
+                        ⚠️ Please do not close the browser to receive transaction results on the website. Thank you!
                     </div>
                     <div className="expire-time">
-                        Giao dịch hết hạn sau <span className="time-value">14:12</span>
+                        Trade expires after <span className="time-value">14:12</span>
                     </div>
                 </div>
             </div>

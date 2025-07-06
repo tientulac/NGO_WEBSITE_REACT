@@ -1,7 +1,10 @@
 import React from "react";
 import "./HomePage.css";
+import { useNavigate } from "react-router-dom";
 
 const HomePage: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="home-page-content">
       {/* Banner */}
@@ -12,6 +15,7 @@ const HomePage: React.FC = () => {
           <div className="d-flex gap-3 mt-4">
             <button
               className="btn-pink text-white px-4"
+              onClick={() => navigate("/campaign")}
             >
               EXPLORE CAMPAIGN
             </button>

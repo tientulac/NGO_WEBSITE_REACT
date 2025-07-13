@@ -6,7 +6,10 @@ import { DonateCampaignDetail } from "../../entities/donateCampaignDetail";
 import Form from "antd/es/form";
 import { renderFilterBar } from "../../components/FilterBar.component";
 import { renderTable } from "../../components/Table.component";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { Project } from "../../entities/project.entity";
+import { BaseService } from "../../services/base.service";
+import { toast } from "react-toastify";
 
 const filters: FilterEntity[] = [
     {
@@ -106,18 +109,59 @@ const dataTable: DonateCampaignDetail[] = [
     }
 ];
 
+const calculateDaysLeft = (deadlineStr?: string | Date): number => {
+    if (!deadlineStr) return 0;
+
+    const now = new Date();
+    const deadline = new Date(deadlineStr);
+
+    // Chênh lệch mili giây
+    const diffMs = deadline.getTime() - now.getTime();
+
+    // Chuyển sang số ngày
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    return diffDays > 0 ? diffDays : 0; // Không âm
+};
+
+const formatCurrency = (value: number) => {
+    if (value > 0) {
+        const valueFormat = Number(value).toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        });
+        return valueFormat;
+    }
+    return 0;
+}
 
 const CampaignDetail: React.FC = () => {
     const [rows, setRows] = useState<DonateCampaignDetail[]>(dataTable);
     const [loading, setLoading] = useState<boolean>(true);
     const [form] = Form.useForm();
     const navigate = useNavigate();
+    const [data, setData] = useState<Project>();
+    const [percent, setPercent] = useState<number>(0);
+    const { id } = useParams(); // Lấy campaign id từ URL
 
     useEffect(() => {
         const getList = async () => {
-            console.log("Fetching campaign details...");
-            setRows(dataTable);
-
+            try {
+                const response = await BaseService.getList<Project>("/campaign/" + id);
+                if (response.status === 200) {
+                    setData(response.data);
+                    setPercent(Number(response.data.detail.total_donat) / Number(response.data.detail.financial_goal) * 100);
+                    setLoading(false);
+                } else {
+                    toast.warning(response.message);
+                    setLoading(false);
+                }
+            } catch (err) {
+                toast.warning("Internal server error");
+                setLoading(false);
+            } finally {
+                setLoading(false);
+            }
         };
 
         getList();
@@ -150,7 +194,7 @@ const CampaignDetail: React.FC = () => {
                     <div className="col-md-5 mb-4">
                         <div className="position-relative">
                             <img
-                                src="https://i.vrace.com.vn/2025/03/24/Thumbnail5x31400x840px2-1742808133.png?w=860&h=0&q=100&dpr=1&rt=auto&g=no&s=hfXXGywkZPxNUdExOffbvw"
+                                src={data?.thumbnail}
                                 alt="Campaign Poster"
                                 className="img-fluid rounded shadow"
                             />
@@ -160,23 +204,23 @@ const CampaignDetail: React.FC = () => {
 
                     {/* Campaign Info */}
                     <div className="col-md-7">
-                        <h4 className="title-cam-detail text-primary">Supporting students to go to school in 2025</h4>
+                        <h4 className="title-cam-detail text-primary">{data?.title}</h4>
                         <div className="bg-white shadow-sm p-3 rounded border">
 
                             {/* Tên tổ chức */}
                             <div className="d-flex align-items-center mb-3">
                                 <i className="fas fa-shield-alt text-primary me-2"></i>
-                                <span className="fs-5 fw-semibold">Fund for Vietnamese Children with Disabilities</span>
+                                <span className="fs-5 fw-semibold">{data?.detail?.purpose || ""}</span>
                             </div>
 
                             {/* Mục tiêu */}
                             <div className="d-flex justify-content-between small text-muted mb-1">
                                 <span className="fw-600">Campaign Objective</span>
-                                <span className="fw-600">30,000,000 VND</span>
+                                <span className="fw-600">{formatCurrency(Number(data?.detail?.financial_goal ?? 0))}</span>
                             </div>
 
                             <div className="custom-progress">
-                                <div className="custom-progress-bar" style={{ width: "32%" }}></div>
+                                <div className="custom-progress-bar" style={{ width: `${percent}%` }}></div>
                             </div>
 
                             {/* Số tiền đã đạt */}
@@ -192,10 +236,10 @@ const CampaignDetail: React.FC = () => {
                                         />
                                         <span className="text-muted small fw-600">85 donations</span>
                                     </div>
-                                    <div className="fw-600 text-muted">Achieved</div>
+                                    <div className="fw-600 text-muted">{data?.status}</div>
                                 </div>
                                 <div className="fs-5 fw-bold text-danger">
-                                    9.720.000 VND
+                                    {formatCurrency(Number(data?.detail?.total_donat ?? 0))}
                                 </div>
                             </div>
 
@@ -211,7 +255,7 @@ const CampaignDetail: React.FC = () => {
                                     />
                                     <div>
                                         <small className="text-muted">Time remaining</small>
-                                        <div className="text-muted small fw-600">87 days</div>
+                                        <div className="text-muted small fw-600">{calculateDaysLeft(data?.deadline)} days</div>
                                     </div>
                                 </div>
 
@@ -219,7 +263,7 @@ const CampaignDetail: React.FC = () => {
                                 <div className="d-flex gap-3">
                                     <button
                                         className="btn-pink text-white px-4"
-                                        onClick={() => navigate("/donate-info")}
+                                        onClick={() => navigate("/donate-info/" + data?.id)}
                                     >
                                         DONATE NOW
                                     </button>

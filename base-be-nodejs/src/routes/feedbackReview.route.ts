@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { ResponseEntity } from "../entities/response.entity";
 import { BaseService } from "../services/Base.service";
-import { FeedbackReview } from "../entities/feedBackReview.entity";
-import { FeedbackReviewClass } from "../models/FeedBackReviewClass";
+import { FeedbackReview } from "../entities/feedbackReview.entity";
+import { FeedbackReviewClass } from "../models/FeedbackReviewClass";
 
 const router = Router();
 const service = new BaseService<FeedbackReview, FeedbackReviewClass>(

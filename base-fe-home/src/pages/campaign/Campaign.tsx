@@ -1,76 +1,49 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Campaign.css";
 import { useNavigate } from "react-router-dom";
+import { Project } from "../../entities/project.entity";
+import { BaseService } from "../../services/base.service";
+import { toast } from "react-toastify";
 
-const campaigns = [
-  {
-    title: 'Supporting students to go to school in 2025',
-    image: 'https://i.vrace.com.vn/2025/03/24/Thumbnail5x31400x840px2-1742808133.png?w=860&h=0&q=100&dpr=1&rt=auto&g=no&s=hfXXGywkZPxNUdExOffbvw',
-    raised: 9728000,
-    goal: 20000000,
-    status: 'RAISING',
-  },
-  {
-    title: 'Oh, who saves my face?',
-    image: 'https://i.vrace.com.vn/2025/03/24/Thumbnail5x31400x840px2-1742808133.png?w=860&h=0&q=100&dpr=1&rt=auto&g=no&s=hfXXGywkZPxNUdExOffbvw',
-    raised: 9738000,
-    goal: 30000000,
-    status: 'RAISING',
-  },
-  {
-    title: 'Green Forest Up 2025',
-    image: 'https://i.vrace.com.vn/2025/03/24/Thumbnail5x31400x840px2-1742808133.png?w=860&h=0&q=100&dpr=1&rt=auto&g=no&s=hfXXGywkZPxNUdExOffbvw',
-    raised: 9738000,
-    goal: 30000000,
-    status: 'RAISING',
-  },
-  {
-    title: 'Please help Chang Thi Ha cure her serious illness.',
-    image: 'https://i.vrace.com.vn/2025/03/24/Thumbnail5x31400x840px2-1742808133.png?w=860&h=0&q=100&dpr=1&rt=auto&g=no&s=hfXXGywkZPxNUdExOffbvw',
-    raised: 9738000,
-    goal: 30000000,
-    status: 'RAISING',
-  },
-  {
-    title: 'Please help Chang Thi Ha cure her serious illness.',
-    image: 'https://i.vrace.com.vn/2025/03/24/Thumbnail5x31400x840px2-1742808133.png?w=860&h=0&q=100&dpr=1&rt=auto&g=no&s=hfXXGywkZPxNUdExOffbvw',
-    raised: 9738000,
-    goal: 30000000,
-    status: 'PENDING',
-    votesUpheld: 75,
-    votesOpposed: 25,
-    location: 'Hanoi, Vietnam',
-    target: 0.45678,
-  },
-  {
-    title: 'Please help Chang Thi Ha cure her serious illness.',
-    image: 'https://i.vrace.com.vn/2025/03/24/Thumbnail5x31400x840px2-1742808133.png?w=860&h=0&q=100&dpr=1&rt=auto&g=no&s=hfXXGywkZPxNUdExOffbvw',
-    raised: 9738000,
-    goal: 30000000,
-    status: 'PENDING',
-    votesUpheld: 80,
-    votesOpposed: 20,
-    location: 'Ho Chi Minh City, Vietnam',
-    target: 0.12345,
-  },
-  {
-    title: 'Please help Chang Thi Ha cure her serious illness.',
-    image: 'https://i.vrace.com.vn/2025/03/24/Thumbnail5x31400x840px2-1742808133.png?w=860&h=0&q=100&dpr=1&rt=auto&g=no&s=hfXXGywkZPxNUdExOffbvw',
-    raised: 9738000,
-    goal: 30000000,
-    status: 'PENDING',
-    votesUpheld: 90,
-    votesOpposed: 10,
-    location: 'Da Nang, Vietnam',
-    target: 0.67890,
-  },
-  // Add ended campaigns here if needed
-];
+const formatCurrency = (value: number) => {
+  if (value > 0) {
+    const valueFormat = Number(value).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    return valueFormat;
+  }
+  return 0;
+}
 
-const formatCurrency = (value: number) =>
-  value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
 
 const Campaign: React.FC = () => {
+  const [data, setData] = useState<Project[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const getList = async () => {
+      try {
+        const response = await BaseService.getList<Project[]>("/campaign/list");
+        if (response.status === 200) {
+          setData(response.data);
+          console.log(response.data);
+          setLoading(false);
+        } else {
+          toast.warning(response.message);
+          setLoading(false);
+        }
+      } catch (err) {
+        toast.warning("Internal server error");
+        setLoading(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getList();
+  }, []);
+
   const [activeTab, setActiveTab] = useState<'RAISING' | 'ENDED' | 'PENDING'>('RAISING');
   const navigate = useNavigate();
 
@@ -111,10 +84,10 @@ const Campaign: React.FC = () => {
         <p>Choose to fight in the field that interests you most.</p>
 
         <div className={activeTab === 'RAISING' || activeTab === 'ENDED' ? 'campaign-list' : 'campaign-list-pending'}>
-          {campaigns
-            .filter((c) => c.status === activeTab)
+          {data
+            .filter((c) => c.status?.toUpperCase() === activeTab.toUpperCase())
             .map((campaign, index) => {
-              const percent = (campaign.raised / campaign.goal) * 100;
+              const percent = ((campaign.detail?.total_donat ?? 0) / (campaign.detail?.financial_goal ?? 1)) * 100;
               return (
                 <div
                   key={index}
@@ -127,7 +100,7 @@ const Campaign: React.FC = () => {
                   {(activeTab === 'RAISING' || activeTab === 'ENDED') ? (
                     <>
                       <div className="card-top">
-                        <img src={campaign.image} alt={campaign.title} />
+                        <img src={campaign.thumbnail} alt={campaign.title} />
                         <div className="tag">Children</div>
                       </div>
 
@@ -139,7 +112,7 @@ const Campaign: React.FC = () => {
                       </div>
 
                       <div className="card-bottom">
-                        <div className="org-name">Quỹ Vì trẻ em khuyết tật Việt Nam</div>
+                        <div className="org-name">{campaign.name}</div>
                         <h4>{campaign.title}</h4>
 
                         <div className="progress-bar">
@@ -150,35 +123,35 @@ const Campaign: React.FC = () => {
                         </div>
 
                         <div className="funds">
-                          <span>{(campaign.raised / 1000).toLocaleString('vi-VN')}.000</span>
+                          <span>{formatCurrency(Number(campaign.detail?.total_donat ?? 0))}</span>
                           <span>{percent.toFixed(1)}%</span>
                         </div>
 
                         <div className="goal">
-                          with the goal of {formatCurrency(campaign.goal)}
+                          with the goal of {formatCurrency(Number(campaign.detail?.financial_goal ?? 0))}
                         </div>
 
-                        <a href="/campaign-detail" className="detail-link">
+                        <a href={`/campaign-detail/${campaign.id}`} className="detail-link">
                           Detail →
                         </a>
                       </div>
                     </>
                   ) : (
                     <div className="campaign-card-pending">
-                      <img src={campaign.image} alt={campaign.title} />
+                      <img src={campaign.thumbnail} alt={campaign.title} />
                       <div className="pending-content">
                         <div className="pending-left">
                           <div className="pending-title">{campaign.title}</div>
-                          <div className="pending-vote">Votes upheld {campaign.votesUpheld}%</div>
-                          <div className="pending-vote">Votes opposed {campaign.votesOpposed}%</div>
+                          <div className="pending-vote">Agree: {campaign.feedbackReviews.filter(feedback => feedback.status?.toUpperCase() === "AGREE").length || 0}</div>
+                          <div className="pending-vote">Reject: {campaign.feedbackReviews.filter(feedback => feedback.status?.toUpperCase() === "DISAGREE").length || 0}</div>
                           <div className="pending-location">
-                            <i className="fas fa-map-marker-alt"></i> {campaign.location}
+                            <i className="fas fa-map-marker-alt"></i> {campaign.detail?.address || ""}
                           </div>
                         </div>
                         <div className="pending-right">
-                          <div className="pending-target">Target<br />{campaign.target}</div>
+                          <div className="pending-target">Target<br />{formatCurrency(Number(campaign.detail?.financial_goal || 0))}</div>
                           <button className="view-details-btn"
-                            onClick={() => navigate("/campaign-pending-detail")}
+                            onClick={() => navigate("/campaign-pending-detail/" + campaign.id)}
                           >VIEW DETAILS</button>
                         </div>
                       </div>

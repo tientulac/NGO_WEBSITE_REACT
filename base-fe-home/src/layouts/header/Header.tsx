@@ -1,9 +1,40 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import './Header.css';
 import logo from '../../static/imgs/logo.jpg';
 import { Dropdown } from 'react-bootstrap';
+import { Category } from "../../entities/category.entity";
+import { BaseService } from "../../services/base.service";
+import { toast } from 'react-toastify';
 
 const Header: React.FC = () => {
+
+  const [data, setData] = useState<Category[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const getList = async () => {
+      try {
+        const response = await BaseService.getList<Category[]>("/category/list");
+        if (response.status === 200) {
+          setData(response.data);
+          console.log(response.data);
+          setLoading(false);
+        } else {
+          toast.warning(response.message);
+          setLoading(false);
+        }
+      } catch (err) {
+        toast.warning("Internal server error");
+        setLoading(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getList();
+  }, []);
+
+
   return (
     <header className="navbar navbar-expand-lg bg-white shadow-sm px-4 py-2">
       <div className="container-fluid d-flex align-items-center justify-content-between">
@@ -25,18 +56,13 @@ const Header: React.FC = () => {
 
         {/* Menu items */}
         <ul className="navbar-nav flex-row gap-4 align-items-center mb-0">
-          <li className="nav-item">
-            <a className="nav-link" href="/home">Home</a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link" href="/campaign">Campaign</a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link" href="/introduce">Introduce</a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link" href="/contact">Contact</a>
-          </li>
+          {data.map((item) => (
+            <li className="nav-item" key={item.url}>
+              <a className="nav-link" href={item.url}>
+                {item.name}
+              </a>
+            </li>
+          ))}
         </ul>
 
         {/* Right section */}

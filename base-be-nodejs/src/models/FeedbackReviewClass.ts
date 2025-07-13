@@ -18,6 +18,7 @@ FeedbackReviewClass.init(
     rating: DataTypes.NUMBER,
     content: DataTypes.STRING,
     is_public: DataTypes.BOOLEAN,
+    status: DataTypes.STRING,
     created_at: DataTypes.DATE,
     updated_at: DataTypes.DATE,
     deleted_at: DataTypes.DATE,

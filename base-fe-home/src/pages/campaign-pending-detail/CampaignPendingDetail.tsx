@@ -1,14 +1,71 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./CampaignPendingDetail.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Button, Form, Input, Modal } from "antd";
 import TextArea from "antd/es/input/TextArea";
+import { BaseService } from "../../services/base.service";
+import { Project } from "../../entities/project.entity";
+import { toast } from "react-toastify";
+
+const calculateDaysLeft = (deadlineStr?: string | Date): number => {
+    if (!deadlineStr) return 0;
+
+    const now = new Date();
+    const deadline = new Date(deadlineStr);
+
+    // Chênh lệch mili giây
+    const diffMs = deadline.getTime() - now.getTime();
+
+    // Chuyển sang số ngày
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    return diffDays > 0 ? diffDays : 0; // Không âm
+};
+
+const formatCurrency = (value: number) => {
+    if (value > 0) {
+        const valueFormat = Number(value).toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        });
+        return valueFormat;
+    }
+    return 0;
+}
 
 const CampaignPendingDetail: React.FC = () => {
     const navigate = useNavigate();
     const [rating, setRating] = useState<number>(5);
     const [hover, setHover] = useState<number>(5);
     const [showModal, setShowModal] = useState(false);
+    const { id } = useParams(); // Lấy campaign id từ URL
+    const [percent, setPercent] = useState<number>(0);
+    const [data, setData] = useState<Project>();
+    const [loading, setLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        const getList = async () => {
+            try {
+                const response = await BaseService.getList<Project>("/campaign/" + id);
+                if (response.status === 200) {
+                    setData(response.data);
+                    console.log(response.data);
+                    setPercent(Number(response.data.detail.total_donat) / Number(response.data.detail.financial_goal) * 100);
+                    setLoading(false);
+                } else {
+                    toast.warning(response.message);
+                    setLoading(false);
+                }
+            } catch (err) {
+                toast.warning("Internal server error");
+                setLoading(false);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        getList();
+    }, []);
 
     const handleApprove = () => {
         Modal.confirm({
@@ -22,7 +79,7 @@ const CampaignPendingDetail: React.FC = () => {
 
                     />
                 </div>
-            ), 
+            ),
             okText: "Ok",
             okType: "primary",
             cancelText: "Cancel",
@@ -43,9 +100,9 @@ const CampaignPendingDetail: React.FC = () => {
             <div className="campaign-detail-container">
                 <div className="campaign-header">
                     <p className="campaign-subtitle">Charity Fundraising</p>
-                    <h3 className="campaign-org">Quỹ Vì trẻ em khuyết tật Việt Nam</h3>
+                    <h3 className="campaign-org">{data?.name}</h3>
                     <h1 className="campaign-title">
-                        Please help Chang Thi Ha cure her serious illness.
+                        {data?.detail?.purpose}
                     </h1>
                 </div>
 
@@ -53,10 +110,7 @@ const CampaignPendingDetail: React.FC = () => {
                     {/* Left content */}
                     <div className="campaign-content">
                         <p>
-                            Every child has dreams and desires to study, to integrate and have companions on their journey to adulthood. But not all children have that opportunity, especially children with disabilities. If they do not go to school, they not only lose the opportunity to access knowledge, but also lose valuable opportunities to make friends and feel connected to the world around them. Loneliness, shyness and invisible barriers can keep them in their own world, while just one opportunity, one open door, can change their future and life. In 2025, the Fund will continue to coordinate with the Communist Youth Union of the Ministry of Foreign Affairs to implement this meaningful program with the goal of awarding 1,200 scholarships, each worth 4,000,000 VND. We are calling for a fundraiser of 200 million VND on the DonaTrust platform, equivalent to 50 scholarships, and will expand the call on other platforms to spread support to more disabled children.
-                            The “Support to School” program of the Fund for Disabled Children not only provides material support and learning conditions for disabled children, but also gives them opportunities - opportunities to study, make friends, integrate and develop equally. Education is not just about letters, but also a bridge between dreams and building the values ​​of each individual. “Support to School” supports a learning journey, supports small hearts to open to the world, so that each child can find a friend, a dream and a brighter future.
-                            The Foundation plans to award scholarships in August 2025, right before the start of the new school year, with the hope that these gifts will help children feel more confident on the path to conquering knowledge and dreams. Each of your supportive actions will open the door for more disabled children to a world full of love and opportunity.
-                            We appreciate and are grateful for your contribution.
+                            {data?.detail?.description}
                         </p>
 
                         <h5 className="campaign-question">What do you know about this fundraising campaign?</h5>
@@ -85,23 +139,23 @@ const CampaignPendingDetail: React.FC = () => {
                     {/* Right vote box */}
                     <div className="vote-box">
                         <div className="vote-info">
-                            <p><span>🕒</span> Time left to vote: <strong>17 days</strong></p>
-                            <p>🎯 Target: <strong>200.000.000 VND</strong></p>
+                            <p><span>🕒</span> Time left to vote: <strong>{calculateDaysLeft(data?.deadline)} days</strong></p>
+                            <p>🎯 Target: <strong>{formatCurrency(Number(data?.detail?.financial_goal ?? 0))}</strong></p>
                         </div>
 
                         <div className="vote-progress">
                             <div className="vote-bar">
-                                <div className="agree" style={{ width: "70%" }} />
-                                <div className="disagree" style={{ width: "30%" }} />
+                                <div className="agree" style={{ width: `${Number((data?.feedbackReviews?.filter(feedback => feedback.status?.toUpperCase() === "AGREE").length || 0)) / Number((data?.feedbackReviews?.length || 1)) * 100}%` }} />
+                                <div className="disagree" style={{ width: `${Number((data?.feedbackReviews?.filter(feedback => feedback.status?.toUpperCase() === "DISAGREE").length || 0)) / Number((data?.feedbackReviews?.length || 1)) * 100}%` }} />
                             </div>
                             <div className="vote-labels">
-                                <span className="agree-label">Agree 70%</span>
-                                <span className="disagree-label">Disagree 30%</span>
+                                <span className="agree-label">Agree {Number((data?.feedbackReviews?.filter(feedback => feedback.status?.toUpperCase() === "AGREE").length || 0)) / Number((data?.feedbackReviews?.length || 1)) * 100}%</span>
+                                <span className="disagree-label">{Number((data?.feedbackReviews?.filter(feedback => feedback.status?.toUpperCase() === "DISAGREE").length || 0)) / Number((data?.feedbackReviews?.length || 1)) * 100}%</span>
                             </div>
                         </div>
 
-                        <p className="total-votes">🧮 Total 85 votes</p>
-                        <p className="votes-detail">✅ 62 votes agree &nbsp;&nbsp; ❌ 13 votes disagree</p>
+                        <p className="total-votes">🧮 Total {data?.feedbackReviews?.length || 0} votes</p>
+                        <p className="votes-detail">✅ {data?.feedbackReviews?.filter(feedback => feedback.status?.toUpperCase() === "AGREE").length || 0} votes agree &nbsp;&nbsp; ❌ {data?.feedbackReviews?.filter(feedback => feedback.status?.toUpperCase() === "DISAGREE").length || 0} votes disagree</p>
 
                         <div className="vote-comments">
                             {[1, 2, 3].map((i) => (

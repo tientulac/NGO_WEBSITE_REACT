@@ -1,6 +1,36 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./DonateInfo.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { Project } from "../../entities/project.entity";
+import { BaseService } from "../../services/base.service";
+import { toast } from "react-toastify";
+
+
+const calculateDaysLeft = (deadlineStr?: string | Date): number => {
+    if (!deadlineStr) return 0;
+
+    const now = new Date();
+    const deadline = new Date(deadlineStr);
+
+    // Chênh lệch mili giây
+    const diffMs = deadline.getTime() - now.getTime();
+
+    // Chuyển sang số ngày
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    return diffDays > 0 ? diffDays : 0; // Không âm
+};
+
+const formatCurrency = (value: number) => {
+    if (value > 0) {
+        const valueFormat = Number(value).toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        });
+        return valueFormat;
+    }
+    return 0;
+}
 
 const DonateInfo: React.FC = () => {
     const [amount, setAmount] = useState<number>(0);
@@ -11,6 +41,34 @@ const DonateInfo: React.FC = () => {
     const [anonymous, setAnonymous] = useState(false);
     const quickAmounts = [50000, 100000, 200000, 500000];
     const navigate = useNavigate();
+    const { id } = useParams(); // Lấy campaign id từ URL
+    const [percent, setPercent] = useState<number>(0);
+    const [data, setData] = useState<Project>();
+    const [loading, setLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        const getList = async () => {
+            try {
+                const response = await BaseService.getList<Project>("/campaign/" + id);
+                if (response.status === 200) {
+                    setData(response.data);
+                    console.log(response.data);
+                    setPercent(Number(response.data.detail.total_donat) / Number(response.data.detail.financial_goal) * 100);
+                    setLoading(false);
+                } else {
+                    toast.warning(response.message);
+                    setLoading(false);
+                }
+            } catch (err) {
+                toast.warning("Internal server error");
+                setLoading(false);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        getList();
+    }, []);
 
     return (
         <div className="donate-info-page">
@@ -28,30 +86,30 @@ const DonateInfo: React.FC = () => {
                     {/* Campaign Summary */}
                     <div className="col-md-5">
                         <img
-                            src="https://i.vrace.com.vn/2025/03/24/Thumbnail5x31400x840px2-1742808133.png?w=860&h=0&q=100&dpr=1&rt=auto&g=no&s=hfXXGywkZPxNUdExOffbvw"
+                            src={data?.thumbnail}
                             className="img-fluid rounded shadow"
                             alt="campaign"
                         />
                         <div className="bg-white mt-5 p-3 shadow-sm rounded border">
                             <div className="d-flex align-items-center mb-2">
                                 <i className="fas fa-shield-alt text-primary me-2"></i>
-                                <strong>Fund for Vietnamese Children with Disabilities</strong>
+                                <strong>{data?.name}</strong>
                             </div>
                             <h5 className="fs-5 text-primary">
-                                Supporting students to go to school in 2025
+                                {data?.title}
                             </h5>
                             <div className="d-flex justify-content-between small text-muted">
                                 <span className="fw-600">Campaign Objective</span>
-                                <span className="fw-600">30,000,000 VND</span>
+                                <span className="fw-600">{formatCurrency(Number(data?.detail?.financial_goal ?? 0))}</span>
                             </div>
                             <div className="custom-progress mt-1">
-                                <div className="custom-progress-bar" style={{ width: "32.4%" }}></div>
+                                <div className="custom-progress-bar" style={{ width: `${Number(data?.detail?.total_donat) / Number(data?.detail?.financial_goal) * 100}%` }}></div>
                             </div>
-                            <div className="text-danger fw-bold mt-2">9.720.000 VND</div>
-                            <small className="text-muted">Achieved 32.4%</small>
+                            <div className="text-danger fw-bold mt-2">{formatCurrency(Number(data?.detail?.total_donat ?? 0))}</div>
+                            <small className="text-muted">Achieved {Number(data?.detail?.total_donat) / Number(data?.detail?.financial_goal) * 100}%</small>
                             <div className="d-flex align-items-center mt-2 text-muted">
                                 <i className="fas fa-clock me-2"></i>
-                                <small>Time remaining <b>87 days</b></small>
+                                <small>Time remaining <b>{calculateDaysLeft(data?.deadline)} days</b></small>
                             </div>
                         </div>
                     </div>

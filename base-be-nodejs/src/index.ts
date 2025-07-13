@@ -9,6 +9,7 @@ import categoryRoute from "./routes/category.route";
 import campaignRoute from "./routes/campaign.route";
 import campaignDetailRoute from "./routes/campaignDetail.route";
 import feedbackReviewRoute from "./routes/feedbackReview.route";
+import donationHistoryRoute from "./routes/donationHistory.route";
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use("/user", userRoute);
 app.use("/campaign", campaignRoute);
 app.use("/campaignDetail", campaignDetailRoute);
 app.use("/feedbackReview", feedbackReviewRoute);
+app.use("/donationHistory", donationHistoryRoute);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);

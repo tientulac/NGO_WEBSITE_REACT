@@ -14,5 +14,4 @@ export interface User extends BaseEntity {
   password?: string;
   is_active?: boolean;
   total_amount?: number;
-  token?: string;
 }

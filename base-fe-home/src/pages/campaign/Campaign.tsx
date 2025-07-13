@@ -8,35 +8,35 @@ const campaigns = [
     image: 'https://i.vrace.com.vn/2025/03/24/Thumbnail5x31400x840px2-1742808133.png?w=860&h=0&q=100&dpr=1&rt=auto&g=no&s=hfXXGywkZPxNUdExOffbvw',
     raised: 9728000,
     goal: 20000000,
-    status: 'raising',
+    status: 'RAISING',
   },
   {
     title: 'Oh, who saves my face?',
     image: 'https://i.vrace.com.vn/2025/03/24/Thumbnail5x31400x840px2-1742808133.png?w=860&h=0&q=100&dpr=1&rt=auto&g=no&s=hfXXGywkZPxNUdExOffbvw',
     raised: 9738000,
     goal: 30000000,
-    status: 'raising',
+    status: 'RAISING',
   },
   {
     title: 'Green Forest Up 2025',
     image: 'https://i.vrace.com.vn/2025/03/24/Thumbnail5x31400x840px2-1742808133.png?w=860&h=0&q=100&dpr=1&rt=auto&g=no&s=hfXXGywkZPxNUdExOffbvw',
     raised: 9738000,
     goal: 30000000,
-    status: 'raising',
+    status: 'RAISING',
   },
   {
     title: 'Please help Chang Thi Ha cure her serious illness.',
     image: 'https://i.vrace.com.vn/2025/03/24/Thumbnail5x31400x840px2-1742808133.png?w=860&h=0&q=100&dpr=1&rt=auto&g=no&s=hfXXGywkZPxNUdExOffbvw',
     raised: 9738000,
     goal: 30000000,
-    status: 'raising',
+    status: 'RAISING',
   },
   {
     title: 'Please help Chang Thi Ha cure her serious illness.',
     image: 'https://i.vrace.com.vn/2025/03/24/Thumbnail5x31400x840px2-1742808133.png?w=860&h=0&q=100&dpr=1&rt=auto&g=no&s=hfXXGywkZPxNUdExOffbvw',
     raised: 9738000,
     goal: 30000000,
-    status: 'pending',
+    status: 'PENDING',
     votesUpheld: 75,
     votesOpposed: 25,
     location: 'Hanoi, Vietnam',
@@ -47,7 +47,7 @@ const campaigns = [
     image: 'https://i.vrace.com.vn/2025/03/24/Thumbnail5x31400x840px2-1742808133.png?w=860&h=0&q=100&dpr=1&rt=auto&g=no&s=hfXXGywkZPxNUdExOffbvw',
     raised: 9738000,
     goal: 30000000,
-    status: 'pending',
+    status: 'PENDING',
     votesUpheld: 80,
     votesOpposed: 20,
     location: 'Ho Chi Minh City, Vietnam',
@@ -58,7 +58,7 @@ const campaigns = [
     image: 'https://i.vrace.com.vn/2025/03/24/Thumbnail5x31400x840px2-1742808133.png?w=860&h=0&q=100&dpr=1&rt=auto&g=no&s=hfXXGywkZPxNUdExOffbvw',
     raised: 9738000,
     goal: 30000000,
-    status: 'pending',
+    status: 'PENDING',
     votesUpheld: 90,
     votesOpposed: 10,
     location: 'Da Nang, Vietnam',
@@ -71,7 +71,7 @@ const formatCurrency = (value: number) =>
   value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
 
 const Campaign: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'raising' | 'ended' | 'pending'>('raising');
+  const [activeTab, setActiveTab] = useState<'RAISING' | 'ENDED' | 'PENDING'>('RAISING');
   const navigate = useNavigate();
 
   return (
@@ -87,30 +87,30 @@ const Campaign: React.FC = () => {
       <div className="campaigns-container">
         <div className="tab-buttons">
           <button
-            className={activeTab === 'raising' ? 'active' : ''}
-            onClick={() => setActiveTab('raising')}
+            className={activeTab === 'RAISING' ? 'active' : ''}
+            onClick={() => setActiveTab('RAISING')}
           >
             Campaign is raising funds
           </button>
           <button
-            className={activeTab === 'pending' ? 'active' : ''}
-            onClick={() => setActiveTab('pending')}
+            className={activeTab === 'PENDING' ? 'active' : ''}
+            onClick={() => setActiveTab('PENDING')}
 
           >
             Campaign is pending
           </button>
           <button
-            className={activeTab === 'ended' ? 'active' : ''}
-            onClick={() => setActiveTab('ended')}
+            className={activeTab === 'ENDED' ? 'active' : ''}
+            onClick={() => setActiveTab('ENDED')}
           >
             Campaign has ended
           </button>
         </div>
 
-        <h2>{activeTab === 'raising' || activeTab === 'ended' ? 'Campaigns Currently Raising Funds' : 'Campaigns Pending'}</h2>
+        <h2>{activeTab === 'RAISING' || activeTab === 'ENDED' ? 'Campaigns Currently Raising Funds' : 'Campaigns Pending'}</h2>
         <p>Choose to fight in the field that interests you most.</p>
 
-        <div className={activeTab === 'raising' || activeTab === 'ended' ? 'campaign-list' : 'campaign-list-pending'}>
+        <div className={activeTab === 'RAISING' || activeTab === 'ENDED' ? 'campaign-list' : 'campaign-list-pending'}>
           {campaigns
             .filter((c) => c.status === activeTab)
             .map((campaign, index) => {
@@ -119,12 +119,12 @@ const Campaign: React.FC = () => {
                 <div
                   key={index}
                   className={
-                    activeTab === 'raising' || activeTab === 'ended'
+                    activeTab === 'RAISING' || activeTab === 'ENDED'
                       ? 'campaign-card'
                       : 'campaign-card-pending'
                   }
                 >
-                  {(activeTab === 'raising' || activeTab === 'ended') ? (
+                  {(activeTab === 'RAISING' || activeTab === 'ENDED') ? (
                     <>
                       <div className="card-top">
                         <img src={campaign.image} alt={campaign.title} />

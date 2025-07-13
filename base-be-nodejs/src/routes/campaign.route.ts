@@ -1,18 +1,20 @@
 import { Router } from "express";
 import { ResponseEntity } from "../entities/response.entity";
 import { BaseService } from "../services/Base.service";
-import { Category } from "../entities/category.entity";
-import { CategoryClass } from "../models/CategoryClass";
-import { sortBy } from "lodash";
+import { Project } from "../entities/project.entity";
+import { ProjectClass } from "../models/ProjectClass";
 
 const router = Router();
-const service = new BaseService<Category, CategoryClass>(CategoryClass);
+const service = new BaseService<Project, ProjectClass>(ProjectClass);
 
 router.get("/list", async (req, res) => {
   try {
     const result = await service.getAll();
-    res.status(200).json(<ResponseEntity<Category[]>>{
-      data: sortBy(result, ["pos"]),
+    res.status(200).json(<ResponseEntity<Project[]>>{
+      data: result.filter(
+        (item) =>
+          item.field_type?.toUpperCase() === "CAMPAIGN" && item.public === true
+      ),
       status: 200,
     });
   } catch (err) {

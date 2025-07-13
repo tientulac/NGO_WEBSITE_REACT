@@ -3,20 +3,21 @@ import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../config/connection";
 import { BaseModel } from "./BaseClass";
 
-export class CategoryClass extends BaseModel {}
+export class FeedbackReviewClass extends BaseModel {}
 
-CategoryClass.init(
+FeedbackReviewClass.init(
   {
     id: {
       type: DataTypes.NUMBER,
       primaryKey: true,
       autoIncrement: true,
     },
-    parent_cate_id: DataTypes.NUMBER,
-    pos: DataTypes.NUMBER,
-    name: DataTypes.STRING,
-    description: DataTypes.STRING,
-    url: DataTypes.STRING,
+    user_id: DataTypes.NUMBER,
+    project_id: DataTypes.NUMBER,
+    organization_id: DataTypes.NUMBER,
+    rating: DataTypes.NUMBER,
+    content: DataTypes.STRING,
+    is_public: DataTypes.BOOLEAN,
     created_at: DataTypes.DATE,
     updated_at: DataTypes.DATE,
     deleted_at: DataTypes.DATE,
@@ -26,8 +27,8 @@ CategoryClass.init(
   },
   {
     sequelize,
-    tableName: "t_category",
-    modelName: "Category",
+    tableName: "t_feedback_review",
+    modelName: "FeedbackReview",
     timestamps: false,
   }
 );

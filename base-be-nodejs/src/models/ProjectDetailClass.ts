@@ -3,20 +3,24 @@ import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../config/connection";
 import { BaseModel } from "./BaseClass";
 
-export class CategoryClass extends BaseModel {}
+export class ProjectDetailClass extends BaseModel {}
 
-CategoryClass.init(
+ProjectDetailClass.init(
   {
     id: {
       type: DataTypes.NUMBER,
       primaryKey: true,
       autoIncrement: true,
     },
-    parent_cate_id: DataTypes.NUMBER,
-    pos: DataTypes.NUMBER,
+    project_id: DataTypes.NUMBER,
+    title: DataTypes.STRING,
     name: DataTypes.STRING,
     description: DataTypes.STRING,
-    url: DataTypes.STRING,
+    purpose: DataTypes.STRING,
+    total_donat: DataTypes.NUMBER,
+    financial_goal: DataTypes.NUMBER,
+    address: DataTypes.STRING,
+    status: DataTypes.STRING,
     created_at: DataTypes.DATE,
     updated_at: DataTypes.DATE,
     deleted_at: DataTypes.DATE,
@@ -26,8 +30,8 @@ CategoryClass.init(
   },
   {
     sequelize,
-    tableName: "t_category",
-    modelName: "Category",
+    tableName: "t_project_detail",
+    modelName: "PrjectDetail",
     timestamps: false,
   }
 );

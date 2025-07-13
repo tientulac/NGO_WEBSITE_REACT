@@ -5,4 +5,5 @@ export interface Category extends BaseEntity {
   name?: string;
   description?: string;
   url?: string;
+  pos?: number;
 }

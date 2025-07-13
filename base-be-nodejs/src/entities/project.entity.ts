@@ -11,4 +11,5 @@ export interface Project extends BaseEntity {
   status?: string;
   field_type?: string;
   deadline?: Date;
+  public?: boolean;
 }

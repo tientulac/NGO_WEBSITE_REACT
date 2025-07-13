@@ -1,6 +1,6 @@
 import { BaseEntity } from "./base.entity";
 
-export interface FeedBackReview extends BaseEntity {
+export interface FeedbackReview extends BaseEntity {
   user_id?: number;
   project_id?: number;
   organization_id?: number;

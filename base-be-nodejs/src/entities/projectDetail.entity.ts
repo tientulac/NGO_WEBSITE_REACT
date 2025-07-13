@@ -7,7 +7,7 @@ export interface ProjectDetail extends BaseEntity {
   description?: string;
   purpose?: string;
   total_donat?: number;
-  finalcial_goal?: number;
+  financial_goal?: number;
   address?: string;
   status?: string;
 }

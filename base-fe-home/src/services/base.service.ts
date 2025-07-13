@@ -1,7 +1,7 @@
 import axios from "axios";
 import { ResponseEntity } from "../entities/response.entity";
 
-const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:3000";
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
 const api = axios.create({
   headers: {
